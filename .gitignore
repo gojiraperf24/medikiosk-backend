@@ -1,16 +1,73 @@
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
-.env
-.venv
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+PIPFILE.lock
+
+# Virtual environments
 venv/
-.idea/
+ENV/
+env/
+
+# IDE
 .vscode/
+.idea/
 *.swp
+*.swo
+*~
 .DS_Store
-db.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Testing
 .pytest_cache/
 .coverage
 htmlcov/
-/tmp/
-/uploads/
+
+# Uploads
+uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Alembic
+alembic/versions/*.py
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,8 +1,10 @@
 version: '3.8'
 
 services:
-  postgres:
+  # PostgreSQL Database
+  db:
     image: postgres:15-alpine
+    container_name: medikiosk-db
     environment:
       POSTGRES_USER: medikiosk_user
       POSTGRES_PASSWORD: medikiosk_password
@@ -16,9 +18,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - medikiosk-network
 
+  # Redis Cache (optional, for session management)
   redis:
     image: redis:7-alpine
+    container_name: medikiosk-redis
     ports:
       - "6379:6379"
     healthcheck:
@@ -26,28 +32,39 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - medikiosk-network
 
-  backend:
-    build: .
+  # FastAPI Backend Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medikiosk-app
+    environment:
+      DATABASE_URL: postgresql://medikiosk_user:medikiosk_password@db:5432/medikiosk_db
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: "true"
+      ENVIRONMENT: development
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      # Add other environment variables as needed
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://medikiosk_user:medikiosk_password@postgres:5432/medikiosk_db
-      REDIS_URL: redis://redis:6379
-      DEBUG: "True"
-      ENVIRONMENT: development
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
-      - .:/app
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+    networks:
+      - medikiosk-network
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   postgres_data:
 
 networks:
-  default:
-    name: medikiosk_network
+  medikiosk-network:
+    driver: bridge
